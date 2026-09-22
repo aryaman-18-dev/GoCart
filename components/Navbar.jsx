@@ -1,10 +1,21 @@
 "use client";
-import { PackageIcon, Search, ShoppingCart, Menu, Home, Store, Info, MessageCircle, LogIn } from "lucide-react";
+import {
+  PackageIcon,
+  Search,
+  ShoppingCart,
+  Menu,
+  Home,
+  Store,
+  Info,
+  MessageCircle,
+  LogIn,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useUser, useClerk, UserButton } from "@clerk/nextjs";
+import { useUser, useClerk, UserButton, Show } from "@clerk/nextjs";
+import axios from "axios";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +31,6 @@ const Navbar = () => {
   const { openSignIn } = useClerk();
   const router = useRouter();
   const cartCount = useSelector((state) => state.cart.total);
-  const isPlusUser = user?.publicMetadata?.plan === "plus";
 
   const [isClient, setIsClient] = useState(false);
   const [search, setSearch] = useState("");
@@ -34,8 +44,9 @@ const Navbar = () => {
     const delayDebounce = setTimeout(async () => {
       if (search.length > 1) {
         try {
-          const response = await fetch(`/api/products/search?query=${encodeURIComponent(search)}`);
-          const data = await response.json();
+          const { data } = await axios.get(
+            `/api/products/search?query=${search}`,
+          );
           setSuggestions(data.results);
         } catch (err) {
           console.error(err);
@@ -58,22 +69,22 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 shadow-sm">
       <div className="mx-6">
         <div className="flex items-center justify-between max-w-6xl mx-auto py-3">
-
           {/* Logo */}
-          <Link href="/" className="relative text-3xl sm:text-4xl font-semibold tracking-tight text-slate-800">
+          <Link
+            href="/"
+            className="relative text-3xl sm:text-4xl font-semibold tracking-tight text-slate-800"
+          >
             <span className="text-emerald-600">go</span>cart
             <span className="text-emerald-600 text-4xl sm:text-5xl">.</span>
-
-            {isPlusUser && (
+            <Show when={{ plan: "plus" }}>
               <p className="absolute text-[12px] font-semibold -top-1 -right-6 sm:-right-8 px-2 sm:px-3 rounded-full text-white bg-gradient-to-r from-emerald-500 to-green-600 shadow-md">
                 plus
               </p>
-            )}
+            </Show>
           </Link>
 
           {/* Desktop */}
           <div className="hidden sm:flex items-center gap-8 text-[15px] font-medium text-slate-600 relative">
-
             {["Home", "Shop", "About", "Contact"].map((item) => (
               <Link
                 key={item}
@@ -154,7 +165,6 @@ const Navbar = () => {
 
           {/* Mobile */}
           <div className="sm:hidden flex items-center gap-3">
-
             <form
               onSubmit={handleSearch}
               className="flex items-center w-[130px] text-xs gap-2 bg-slate-100/70 px-3 py-2 rounded-full border border-slate-200 relative"
@@ -172,7 +182,11 @@ const Navbar = () => {
             {isClient && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-2 hover:bg-emerald-50 rounded-full">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-2 hover:bg-emerald-50 rounded-full"
+                  >
                     <Menu size={22} />
                   </Button>
                 </DropdownMenuTrigger>
@@ -186,10 +200,11 @@ const Navbar = () => {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
 
-                  {[{ href: "/", label: "Home", icon: Home },
+                  {[
+                    { href: "/", label: "Home", icon: Home },
                     { href: "/shop", label: "Shop", icon: Store },
                     { href: "/about", label: "About", icon: Info },
-                    { href: "/contact", label: "Contact", icon: MessageCircle }
+                    { href: "/contact", label: "Contact", icon: MessageCircle },
                   ].map(({ href, label, icon: Icon }) => (
                     <DropdownMenuItem key={label} asChild>
                       <Link

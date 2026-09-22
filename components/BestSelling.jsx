@@ -1,23 +1,44 @@
 'use client'
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBestSellingProducts } from "@/lib/features/product/productSlice";
 import Title from './Title'
 import ProductCard from './ProductCard'
-import { useSelector } from 'react-redux'
 
-const BestSelling = () => {
+export default function BestSelling() {
+  const dispatch = useDispatch();
+  const { bestSelling, bestSellingLoading } = useSelector(state => state.product);
 
-    const displayQuantity = 8
-    const products = useSelector(state => state.product.list)
+  useEffect(() => {
+    dispatch(fetchBestSellingProducts());
+  }, [dispatch]);
 
-    return (
-        <div className='px-6 my-30 max-w-6xl mx-auto'>
-            <Title title='Best Selling' description={`Showing ${products.length < displayQuantity ? products.length : displayQuantity} of ${products.length} products`} href='/shop' />
-            <div className='mt-12  grid grid-cols-2 sm:flex flex-wrap gap-6 xl:gap-12'>
-                {products.slice().sort((a, b) => b.rating.length - a.rating.length).slice(0, displayQuantity).map((product, index) => (
-                    <ProductCard key={index} product={product} />
-                ))}
-            </div>
-        </div>
-    )
+  if (bestSellingLoading) 
+    return <p className="text-center py-12 text-slate-500 font-medium">Loading best selling...</p>;
+
+  return (
+    <section className="px-6 py-12 sm:py-4 my-16 max-w-6xl mx-auto">
+      
+      {/* Section Title */}
+      <Title 
+        title='Best Selling' 
+        description={`Showing ${bestSelling.length} of ${bestSelling.length} products`} 
+        href='/shop' 
+      />
+
+      {/* Product Grid */}
+      <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 xl:gap-12">
+        {bestSelling.map((product, index) => (
+          <ProductCard
+            key={index}
+            product={product}
+            className="
+              transition-transform duration-300 ease-in-out
+              hover:scale-[1.03] hover:shadow-xl
+            "
+          />
+        ))}
+      </div>
+    </section>
+  );
 }
-
-export default BestSelling

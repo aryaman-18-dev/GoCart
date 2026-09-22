@@ -32,9 +32,9 @@ const Footer = () => {
         {
             title: "CONTACT",
             links: [
-                { text: "+1-212-456-7890", path: '/', icon: MailIcon },
-                { text: "contact@example.com", path: '/', icon: PhoneIcon },
-                { text: "794 Francisco, 94102", path: '/', icon: MapPinIcon }
+                { text: "+022 - 8989 4754", path: '/', icon: MailIcon },
+                { text: "gocart@gmail.com", path: '/', icon: PhoneIcon },
+                { text: "794 Mumbai, 400077", path: '/', icon: MapPinIcon }
             ]
         }
     ];
@@ -47,44 +47,89 @@ const Footer = () => {
     ]
 
     return (
-        <footer className="mx-6 bg-white">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col md:flex-row items-start justify-between gap-10 py-10 border-b border-slate-500/30 text-slate-500">
-                    <div>
-                        <Link href="/" className="text-4xl font-semibold text-slate-700">
-                            <span className="text-green-600">go</span>cart<span className="text-green-600 text-5xl leading-0">.</span>
-                        </Link>
-                        <p className="max-w-[410px] mt-6 text-sm">Welcome to gocart, your ultimate destination for the latest and smartest gadgets. From smartphones and smartwatches to essential accessories, we bring you the best in innovation — all in one place.</p>
-                        <div className="flex items-center gap-3 mt-5">
-                            {socialIcons.map((item, i) => (
-                                <Link href={item.link} key={i} className="flex items-center justify-center w-10 h-10 bg-slate-100 hover:scale-105 hover:border border-slate-300 transition rounded-full">
+    <footer className="mx-6 mt-15 bg-gradient-to-b from-white to-slate-50/60 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row items-start justify-between gap-14 py-16 border-b border-slate-200 text-slate-500">
+                
+                {/* Brand Section */}
+                <div className="max-w-md">
+                    <Link href="/" className="text-4xl font-semibold tracking-tight text-slate-800 hover:opacity-80 transition">
+                        <span className="text-green-600">go</span>
+                        cart
+                        <span className="text-green-600 text-5xl leading-none">.</span>
+                    </Link>
+
+                    <p className="mt-6 text-sm leading-relaxed text-slate-500">
+                        Welcome to gocart, your ultimate destination for the latest and smartest gadgets.
+                        From smartphones and smartwatches to essential accessories,
+                        we bring you the best in innovation — all in one place.
+                    </p>
+
+                    {/* Social Icons */}
+                    <div className="flex items-center gap-4 mt-8">
+                        {socialIcons.map((item, i) => (
+                            <Link
+                                href={item.link}
+                                key={i}
+                                className="group flex items-center justify-center w-10 h-10 rounded-full 
+                                           bg-white border border-slate-200 shadow-sm
+                                           hover:shadow-md hover:-translate-y-1 
+                                           transition-all duration-300"
+                            >
+                                <span className="text-slate-500 group-hover:text-green-600 transition-colors">
                                     <item.icon />
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap justify-between w-full md:w-[45%] gap-5 text-sm ">
-                        {linkSections.map((section, index) => (
-                            <div key={index}>
-                                <h3 className="font-medium text-slate-700 md:mb-5 mb-3">{section.title}</h3>
-                                <ul className="space-y-2.5">
-                                    {section.links.map((link, i) => (
-                                        <li key={i} className="flex items-center gap-2">
-                                            {link.icon && <link.icon />}
-                                            <Link href={link.path} className="hover:underline transition">{link.text}</Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                                </span>
+                            </Link>
                         ))}
                     </div>
                 </div>
-                <p className="py-4 text-sm text-slate-500">
-                    Copyright 2025 © gocart All Right Reserved.
-                </p>
+
+                {/* Links Section */}
+                <div className="flex flex-wrap justify-between w-full md:w-[48%] gap-10 text-sm">
+                    {linkSections.map((section, index) => (
+                        <div key={index}>
+                            <h3 className="font-semibold tracking-wide text-slate-800 md:mb-6 mb-4 text-sm">
+                                {section.title}
+                            </h3>
+
+                            <ul className="space-y-3">
+                                {section.links.map((link, i) => (
+                                    <li key={i} className="flex items-center gap-2 group">
+                                        {link.icon && (
+                                            <span className="text-slate-400 group-hover:text-green-600 transition">
+                                                <link.icon />
+                                            </span>
+                                        )}
+
+                                        <Link
+                                            href={link.path}
+                                            className="relative text-slate-500 hover:text-slate-800 transition"
+                                        >
+                                            <span className="after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 
+                                                             after:bg-green-600 after:transition-all after:duration-300 
+                                                             hover:after:w-full">
+                                                {link.text}
+                                            </span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
             </div>
-        </footer>
-    );
+
+            {/* Bottom Copyright */}
+            <div className="py-6 text-sm text-slate-400 flex flex-col md:flex-row items-center justify-between gap-2">
+                <p>© 2025 gocart. All rights reserved.</p>
+
+                <div className="text-xs tracking-wide text-slate-400">
+                    Designed with precision.
+                </div>
+            </div>
+        </div>
+    </footer>
+);
 };
 
 export default Footer;
