@@ -24,6 +24,7 @@ const OrderSummary = ({ totalPrice, items }) => {
   const [couponCodeInput, setCouponCodeInput] = useState("");
   const [coupon, setCoupon] = useState("");
 
+  // Apply coupon
   const handleCouponCode = async (event) => {
     event.preventDefault();
 
@@ -53,6 +54,7 @@ const OrderSummary = ({ totalPrice, items }) => {
     }
   };
 
+  // Place order
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
@@ -84,12 +86,18 @@ const OrderSummary = ({ totalPrice, items }) => {
         },
       });
 
+      // Stripe payment
       if (paymentMethod === "STRIPE") {
-        // Redirect to Stripe Checkout
-        window.location.href = data.session.url;
+        if (data?.session?.url) {
+          window.location.href = data.session.url;
+        } else {
+          toast.error("Unable to create Stripe checkout session.");
+        }
       } else {
+        // COD
         toast.success(data.message);
         router.push("/orders");
+
         dispatch(fetchCart({ getToken }));
       }
     } catch (error) {
@@ -103,20 +111,41 @@ const OrderSummary = ({ totalPrice, items }) => {
 
       <p className="text-slate-400 text-xs my-4">Payment Method</p>
 
+      {/* COD */}
       <div className="flex gap-2 items-center">
         <input
           type="radio"
           id="COD"
+          name="paymentMethod"
+          value="COD"
           onChange={() => setPaymentMethod("COD")}
           checked={paymentMethod === "COD"}
           className="accent-gray-500"
         />
 
         <label htmlFor="COD" className="cursor-pointer">
-          COD
+          Cash on Delivery
         </label>
       </div>
 
+      {/* Stripe */}
+      <div className="flex gap-2 items-center mt-3">
+        <input
+          type="radio"
+          id="STRIPE"
+          name="paymentMethod"
+          value="STRIPE"
+          onChange={() => setPaymentMethod("STRIPE")}
+          checked={paymentMethod === "STRIPE"}
+          className="accent-gray-500"
+        />
+
+        <label htmlFor="STRIPE" className="cursor-pointer">
+          Pay Online with Stripe
+        </label>
+      </div>
+
+      {/* Address */}
       <div className="my-4 py-4 border-y border-slate-200 text-slate-400">
         <p>Address</p>
 
@@ -138,9 +167,12 @@ const OrderSummary = ({ totalPrice, items }) => {
             {addressList.length > 0 && (
               <select
                 className="border border-slate-400 p-2 w-full my-3 outline-none rounded"
-                onChange={(e) =>
-                  setSelectedAddress(addressList[e.target.value])
-                }
+                onChange={(e) => {
+                  if (e.target.value !== "") {
+                    setSelectedAddress(addressList[e.target.value]);
+                  }
+                }}
+                defaultValue=""
               >
                 <option value="">Select Address</option>
 
@@ -154,6 +186,7 @@ const OrderSummary = ({ totalPrice, items }) => {
             )}
 
             <button
+              type="button"
               className="flex items-center gap-1 text-slate-600 mt-1"
               onClick={() => setShowAddressModal(true)}
             >
@@ -164,11 +197,11 @@ const OrderSummary = ({ totalPrice, items }) => {
         )}
       </div>
 
+      {/* Price Summary */}
       <div className="pb-4 border-b border-slate-200">
         <div className="flex justify-between">
           <div className="flex flex-col gap-1 text-slate-400">
             <p>Subtotal:</p>
-
             <p>Shipping:</p>
 
             {coupon && <p>Coupon:</p>}
@@ -196,6 +229,7 @@ const OrderSummary = ({ totalPrice, items }) => {
           </div>
         </div>
 
+        {/* Coupon */}
         {!coupon ? (
           <form
             onSubmit={(e) =>
@@ -213,7 +247,10 @@ const OrderSummary = ({ totalPrice, items }) => {
               className="border border-slate-400 p-1.5 rounded w-full outline-none"
             />
 
-            <button className="bg-slate-600 text-white px-3 rounded hover:bg-slate-800 active:scale-95 transition-all">
+            <button
+              type="submit"
+              className="bg-slate-600 text-white px-3 rounded hover:bg-slate-800 active:scale-95 transition-all"
+            >
               Apply
             </button>
           </form>
@@ -237,6 +274,7 @@ const OrderSummary = ({ totalPrice, items }) => {
         )}
       </div>
 
+      {/* Total */}
       <div className="flex justify-between py-4">
         <p>Total:</p>
 
@@ -254,6 +292,7 @@ const OrderSummary = ({ totalPrice, items }) => {
             }`}
           >
             {currency}
+
             {coupon
               ? (totalPrice - (coupon.discount / 100) * totalPrice).toFixed(2)
               : totalPrice.toLocaleString()}
@@ -261,17 +300,20 @@ const OrderSummary = ({ totalPrice, items }) => {
         </p>
       </div>
 
+      {/* Place Order */}
       <button
+        type="button"
         onClick={(e) =>
           toast.promise(handlePlaceOrder(e), {
-            loading: "placing Order...",
+            loading: "Placing Order...",
           })
         }
         className="w-full bg-slate-700 text-white py-2.5 rounded hover:bg-slate-900 active:scale-95 transition-all"
       >
-        Place Order
+        {paymentMethod === "STRIPE" ? "Pay with Stripe" : "Place Order"}
       </button>
 
+      {/* Address Modal */}
       {showAddressModal && (
         <AddressModal setShowAddressModal={setShowAddressModal} />
       )}
