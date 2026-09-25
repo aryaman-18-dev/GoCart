@@ -119,7 +119,7 @@ export async function POST(request) {
     }
     // Only COD is supported now; proceed to clear cart and confirm order placement.
     if (paymentMethod === "STRIPE") {
-      const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
       const origin = await request.headers.get("origin");
 
       const session = await stripe.checkout.sessions.create({
